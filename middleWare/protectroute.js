@@ -59,6 +59,7 @@ const protcetRoute = async (req, res, next) => {
       res
     );
   }
+  // email
   let { email: currentUser } = users.find((user) => {
     return user.email == decoded.email;
   });
