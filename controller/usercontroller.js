@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const path = require("path");
+const { genratetoken } = require("../helper/jwtAutentication");
 const fileName = path.join(__dirname, "..", "data", "user.json");
 const users = JSON.parse(fs.readFileSync(fileName, "utf-8"));
 const User = require("../module/usermodule");
@@ -29,6 +30,23 @@ const loginUser = async (req, res, next) => {
       req.currentUser.password
     );
 
+    let jwttoken = await genratetoken(
+      { email: req.currentUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+    console.log(jwttoken);
+    res.cookie("jwt", jwttoken);
+    res.status(200).json({
+      status: "Successful",
+      data: [
+        {
+          jwt: jwttoken,
+        },
+      ],
+    });
+
+    // res.send("login Succesfully");
     if (!result) {
       return res.send("Wrong Password");
     }
@@ -36,7 +54,6 @@ const loginUser = async (req, res, next) => {
     console.log(err);
     return err;
   }
-  res.send("login Succesfully");
 };
 
 module.exports.signUpUser = signUpUser;
